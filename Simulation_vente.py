@@ -153,5 +153,19 @@ else:
 
         # Enregistrer la simulation pour aujourd'hui
         simulation_log[user_id] = today
-        with open(SIMULATION_LOG, "w") as f:
-            json.dump(simulation_log, f)
+        
+  # Vérifier si le fichier existe, sinon le créer
+if not os.path.exists(SIMULATION_LOG):
+    with open(SIMULATION_LOG, "w") as f:
+        json.dump({}, f)
+
+# Charger le contenu du fichier
+with open(SIMULATION_LOG, "r") as f:
+    try:
+        simulation_log = json.load(f)
+    except json.JSONDecodeError:
+        simulation_log = {}
+        # Réinitialiser le fichier en cas d'erreur
+        with open(SIMULATION_LOG, "w") as reset_file:
+            json.dump(simulation_log, reset_file)
+
