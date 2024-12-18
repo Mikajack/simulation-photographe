@@ -55,11 +55,15 @@ else:
         user_response = st.session_state.chat_history[-1]["user"]
         st.write(f"**Votre réponse précédente :** {user_response}")
 
-        completion = openai.Completion.create(
-            engine="text-davinci-003",
-            prompt=f"Vous êtes un client fictif. Voici l'historique de la conversation : {st.session_state.chat_history}. Répondez de manière naturelle et réaliste.",
-            max_tokens=150
-        )
+        completion = openai.ChatCompletion.create(
+    model="gpt-3.5-turbo",
+    messages=[
+        {"role": "system", "content": "Vous êtes un client fictif jouant un rôle dans une simulation de vente."},
+        {"role": "user", "content": f"Voici l'historique de la conversation : {st.session_state.chat_history}. Répondez de manière naturelle et réaliste."}
+    ],
+    max_tokens=150
+)
+        
         ai_reply = completion.choices[0].text.strip()
         st.session_state.chat_history.append({"client": ai_reply})
         st.write(f"**Client :** {ai_reply}")
@@ -72,7 +76,7 @@ else:
     elif st.session_state.step == 2:
         st.write("Continuez la discussion pour répondre aux besoins du client.")
 
-        completion = openai.Completion.create(
+        completion = openai.ChatCompletion.create(
             engine="text-davinci-003",
             prompt=f"Voici l'historique de la conversation : {st.session_state.chat_history}. Le client commence à poser des objections. Répondez en tant que client fictif.",
             max_tokens=150
@@ -92,7 +96,7 @@ else:
         if st.button("Envoyer votre pitch final", key="final_send"):
             st.session_state.chat_history.append({"user": response})
 
-            completion = openai.Completion.create(
+            completion = openai.ChatCompletion.create(
                 engine="text-davinci-003",
                 prompt=f"Voici l'historique complet de la conversation : {st.session_state.chat_history}. Évaluez la performance du vendeur sur 10 en fonction de :\\n1. Compréhension des besoins.\\n2. Réponse aux objections.\\n3. Pitch final convaincant.",
                 max_tokens=100
