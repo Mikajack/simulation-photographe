@@ -3,9 +3,12 @@ import openai
 import os
 import json
 from datetime import datetime
+# Récupérer la clé API depuis les secrets Streamlit
+openai.api_key = os.getenv("OPENAI_API_KEY")
 
-# Configurez votre clé API OpenAI
-openai.api_key = "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"
+# Vérifiez si la clé a été chargée correctement (facultatif)
+if not openai.api_key:
+    raise ValueError("La clé API OpenAI n'est pas configurée. Ajoutez-la dans les secrets de Streamlit Cloud.")
 
 # Fichier pour enregistrer les simulations
 SIMULATION_LOG = "simulation_log.json"
