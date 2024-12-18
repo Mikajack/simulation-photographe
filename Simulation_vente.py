@@ -42,11 +42,12 @@ else:
 
     if st.session_state.step == 0:
         client_message = "Bonjour ! Je cherche un photographe pour un projet spécial. Pouvez-vous m'en dire plus sur vos services ?"
-        st.session_state.chat_history.append({"client": client_message})
+        if len(st.session_state.chat_history) == 0:
+            st.session_state.chat_history.append({"client": client_message})
         st.write(f"**Client :** {client_message}")
 
         response = st.text_input("Votre réponse :", key="step_0_response")
-        if response:
+        if st.button("Envoyer votre réponse", key="step_0_send"):
             st.session_state.chat_history.append({"user": response})
             st.session_state.step += 1
 
@@ -64,7 +65,7 @@ else:
         st.write(f"**Client :** {ai_reply}")
 
         response = st.text_input("Votre réponse :", key="step_1_response")
-        if response:
+        if st.button("Envoyer votre réponse", key="step_1_send"):
             st.session_state.chat_history.append({"user": response})
             st.session_state.step += 1
 
@@ -81,14 +82,14 @@ else:
         st.write(f"**Client :** {ai_reply}")
 
         response = st.text_input("Votre réponse :", key="step_2_response")
-        if response:
+        if st.button("Envoyer votre réponse", key="step_2_send"):
             st.session_state.chat_history.append({"user": response})
             st.session_state.step += 1
 
     elif st.session_state.step == 3:
         st.write("Finalisez la vente avec un pitch et une proposition de prix.")
         response = st.text_area("Rédigez votre pitch final :", key="final_pitch")
-        if response:
+        if st.button("Envoyer votre pitch final", key="final_send"):
             st.session_state.chat_history.append({"user": response})
 
             completion = openai.Completion.create(
