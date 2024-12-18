@@ -3,17 +3,14 @@ import openai
 import os
 import json
 from datetime import datetime
-# Récupérer la clé API depuis les secrets Streamlit
-openai.api_key = os.getenv("OPENAI_API_KEY")
 
-# Vérifiez si la clé a été chargée correctement (facultatif)
-if not openai.api_key:
-    raise ValueError("La clé API OpenAI n'est pas configurée. Ajoutez-la dans les secrets de Streamlit Cloud.")
+# Configurez votre clé API OpenAI
+openai.api_key = os.getenv("OPENAI_API_KEY")
 
 # Fichier pour enregistrer les simulations
 SIMULATION_LOG = "simulation_log.json"
 
-# Initialiser les scénarios
+# Définir les scénarios
 scenarios = {
     "Mariage": [
         "Bonjour, nous cherchons un photographe pour notre mariage. Pouvez-vous nous expliquer ce que vous proposez ?",
@@ -28,95 +25,23 @@ scenarios = {
         "Pouvez-vous retoucher les photos ?",
         "Combien de temps faut-il pour recevoir les photos ?",
         "Pourquoi devrais-je vous choisir comme photographe de portrait ?"
-    ],
-    "Mode": [
-        "Nous recherchons un photographe pour une séance de mode. Quels sont vos services ?",
-        "Comment garantissez-vous que vos photos capturent bien nos vêtements et accessoires ?",
-        "Pouvez-vous proposer des lieux ou des styles pour notre campagne ?",
-        "Quels sont vos tarifs pour une séance complète ?",
-        "Pourquoi devrions-nous vous engager pour cette séance de mode ?"
-    ],
-    "Grossesse": [
-        "Je veux immortaliser ma grossesse. Que proposez-vous ?",
-        "Quels sont vos tarifs pour une séance photo de grossesse ?",
-        "Pouvez-vous inclure mon conjoint et mes enfants dans les photos ?",
-        "Avez-vous des accessoires ou vêtements pour la séance ?",
-        "Pourquoi devrais-je choisir vos services pour cette étape importante ?"
-    ],
-    "Packshot": [
-        "Nous avons besoin de photos de nos produits pour un site web. Que proposez-vous ?",
-        "Quels sont vos tarifs pour des photos de produit en studio ?",
-        "Pouvez-vous ajouter des retouches pour améliorer l’apparence des produits ?",
-        "Comment garantissez-vous que vos photos sont adaptées au e-commerce ?",
-        "Pourquoi devrions-nous travailler avec vous pour nos photos de produit ?"
-    ],
-    "Nouveau-né": [
-        "Je veux des photos de mon nouveau-né. Que proposez-vous ?",
-        "Quels sont vos tarifs pour une séance photo de bébé ?",
-        "Pouvez-vous garantir que la séance sera sans stress pour le bébé ?",
-        "Quels accessoires fournissez-vous pour la séance ?",
-        "Pourquoi devrais-je choisir vos services pour cette séance unique ?"
-    ],
-    "Corporate": [
-        "Nous recherchons un photographe pour des portraits d'équipe. Pouvez-vous nous expliquer vos services ?",
-        "Quels sont vos tarifs pour une séance en entreprise ?",
-        "Nous avons une contrainte de temps. Combien de temps dure une séance ?",
-        "Comment garantissez-vous que vos photos reflètent notre image professionnelle ?",
-        "Pourquoi devrions-nous travailler avec vous pour ce projet ?"
-    ],
-    "Architecture": [
-        "Nous avons besoin d’un photographe pour capturer des bâtiments. Pouvez-vous nous expliquer vos services ?",
-        "Quels sont vos tarifs pour photographier un projet immobilier ?",
-        "Nous cherchons à différencier notre portfolio. Qu'est-ce qui rend votre travail unique ?",
-        "Comment garantissez-vous des photos précises et professionnelles ?",
-        "Pourquoi devrions-nous choisir vos services pour notre projet ?"
-    ],
-    "Culinaire": [
-        "Nous recherchons un photographe pour des plats. Quels sont vos services ?",
-        "Comment garantissez-vous que vos photos donnent envie de goûter ?",
-        "Quels sont vos tarifs pour une séance culinaire ?",
-        "Pouvez-vous inclure la retouche pour améliorer les couleurs et les textures ?",
-        "Pourquoi devrions-nous choisir vos services pour ce projet culinaire ?"
-    ],
-    "Animalier": [
-        "Je veux des photos de mon animal de compagnie. Que proposez-vous ?",
-        "Quels sont vos tarifs pour une séance photo animale ?",
-        "Pouvez-vous garantir que mon animal sera à l’aise durant la séance ?",
-        "Quels accessoires utilisez-vous pour les photos d’animaux ?",
-        "Pourquoi devrais-je choisir vos services pour immortaliser mon compagnon ?"
-    ],
-    "Sport": [
-        "Nous cherchons un photographe pour couvrir un événement sportif. Quels sont vos services ?",
-        "Quels sont vos tarifs pour une journée complète de reportage sportif ?",
-        "Comment garantissez-vous que vos photos capturent bien l'action ?",
-        "Pouvez-vous livrer les photos rapidement après l'événement ?",
-        "Pourquoi devrions-nous vous choisir comme photographe de sport ?"
-    ],
-    "Paysage": [
-        "Je voudrais une photo artistique de paysages. Que proposez-vous ?",
-        "Quels sont vos tarifs pour des tirages de vos photos de paysage ?",
-        "Pouvez-vous personnaliser un cadre ou un format pour mon mur ?",
-        "Comment garantissez-vous que vos photos sont uniques ?",
-        "Pourquoi devrais-je acheter vos œuvres photographiques ?"
-    ],
-    "Voyage": [
-        "Je voudrais immortaliser mon prochain voyage. Que proposez-vous ?",
-        "Quels sont vos tarifs pour m’accompagner lors de ce voyage ?",
-        "Comment garantissez-vous que les photos reflèteront bien mes souvenirs ?",
-        "Pouvez-vous aussi capturer des portraits pendant le voyage ?",
-        "Pourquoi devrais-je vous engager pour ce projet de voyage ?"
-    ],
-    "Autres": [
-        "Expliquez-nous vos besoins, et nous personnaliserons l'expérience pour vous."
     ]
+    # Ajoutez d'autres scénarios ici...
 }
 
-# Charger ou initialiser le journal des simulations
-if os.path.exists(SIMULATION_LOG):
-    with open(SIMULATION_LOG, "r") as f:
+# Vérifier si le fichier SIMULATION_LOG existe, sinon le créer
+if not os.path.exists(SIMULATION_LOG):
+    with open(SIMULATION_LOG, "w") as f:
+        json.dump({}, f)
+
+# Charger le journal des simulations
+with open(SIMULATION_LOG, "r") as f:
+    try:
         simulation_log = json.load(f)
-else:
-    simulation_log = {}
+    except json.JSONDecodeError:
+        simulation_log = {}
+        with open(SIMULATION_LOG, "w") as reset_file:
+            json.dump(simulation_log, reset_file)
 
 # Récupérer l'utilisateur actuel (par son nom ou identifiant)
 user_id = st.text_input("Entrez votre identifiant utilisateur :", "utilisateur_anonyme")
@@ -132,11 +57,12 @@ else:
         questions = scenarios[scenario_choice]
         total_score = 0
 
-        for question in questions:
-            st.subheader(f"Question : {question}")
-            response = st.text_input(f"Votre réponse à : {question}")
+        st.write("### Simulation de vente")
+        for i, question in enumerate(questions):
+            st.write(f"**Question {i + 1}:** {question}")
+            response = st.text_input(f"Votre réponse à cette question ({i + 1}) :", key=f"response_{i}")
 
-            if st.button(f"Évaluer la réponse à : {question}"):
+            if response:
                 completion = openai.Completion.create(
                     engine="text-davinci-003",
                     prompt=f"Analysez cette réponse : '{response}' à la question : '{question}'. "
@@ -145,7 +71,7 @@ else:
                     max_tokens=100
                 )
                 feedback = completion.choices[0].text.strip()
-                st.write(f"Évaluation AI : {feedback}")
+                st.write(f"**Évaluation AI :** {feedback}")
                 try:
                     score = int(feedback.split(":")[-1].strip())
                 except ValueError:
@@ -156,19 +82,5 @@ else:
 
         # Enregistrer la simulation pour aujourd'hui
         simulation_log[user_id] = today
-        
-  # Vérifier si le fichier existe, sinon le créer
-if not os.path.exists(SIMULATION_LOG):
-    with open(SIMULATION_LOG, "w") as f:
-        json.dump({}, f)
-
-# Charger le contenu du fichier
-with open(SIMULATION_LOG, "r") as f:
-    try:
-        simulation_log = json.load(f)
-    except json.JSONDecodeError:
-        simulation_log = {}
-        # Réinitialiser le fichier en cas d'erreur
-        with open(SIMULATION_LOG, "w") as reset_file:
-            json.dump(simulation_log, reset_file)
-
+        with open(SIMULATION_LOG, "w") as f:
+            json.dump(simulation_log, f)
